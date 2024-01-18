@@ -1,0 +1,36 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Simulation parameters
+grid_size = 100  # Size of the 2D grid
+dx = 1.0  # Grid spacing
+dt = 0.1  # Time step
+duration = 10.0  # Simulation duration
+
+# Initialize variables
+u = np.zeros((grid_size, grid_size))  # x-component of velocity
+v = np.zeros((grid_size, grid_size))  # y-component of velocity
+h = np.zeros((grid_size, grid_size))  # Height of the water column
+
+# Initial conditions (setting up a simple disturbance)
+h[40:60, 40:60] = 1.0
+
+# Simulation loop
+for t in np.arange(0, duration, dt):
+    # Compute gradients
+    du_dx, du_dy = np.gradient(u, dx)
+    dv_dx, dv_dy = np.gradient(v, dx)
+    dh_dx, dh_dy = np.gradient(h, dx)
+
+    # Update velocity and height using the shallow-water equations
+    u -= dt * 9.81 * dh_dx
+    v -= dt * 9.81 * dh_dy
+    h -= dt * (u * du_dx + v * dv_dy)
+
+# Visualize the final state
+plt.imshow(h, cmap='Blues', extent=(0, grid_size, 0, grid_size))
+plt.colorbar(label='Water Height')
+plt.title('Weather Pattern Simulation')
+plt.xlabel('X-axis')
+plt.ylabel('Y-axis')
+plt.show()
