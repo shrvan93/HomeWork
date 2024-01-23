@@ -2,10 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Simulation parameters
-grid_size = 100  # Size of the 2D grid
-dx = 1.0  # Grid spacing
-dt = 0.1  # Time step
-duration = 10.0  # Simulation duration
+grid_size = 100
+dx = 0.5
+dt = 0.01
+duration = 10.0
+
 
 # Initialize variables
 u = np.zeros((grid_size, grid_size))  # x-component of velocity
@@ -25,7 +26,14 @@ for t in np.arange(0, duration, dt):
     # Update velocity and height using the shallow-water equations
     u -= dt * 9.81 * dh_dx
     v -= dt * 9.81 * dh_dy
-    h -= dt * (u * du_dx + v * dv_dy)
+
+    # Avoid division by zero or small values
+    denom = dh_dx + dh_dy
+    denom[abs(denom) < 1e-6] = 1e-6  # Replace small values with a small constant
+
+    h -= dt * (u * du_dx + v * dv_dy) / denom
+
+
 
 # Visualize the final state
 plt.imshow(h, cmap='Blues', extent=(0, grid_size, 0, grid_size))
